@@ -76,7 +76,7 @@ public class UserInput : MonoBehaviour {
     private void RotateCamera() {
         Vector3 origin = Camera.main.transform.eulerAngles;
         Vector3 destination = origin;
-        if (Input.GetMouseButton(3)) {
+        if (Input.GetMouseButton(2)) {
             destination.x -= Input.GetAxis("Mouse Y") * rotateAmount;
             destination.y += Input.GetAxis("Mouse X") * rotateAmount;
         }
