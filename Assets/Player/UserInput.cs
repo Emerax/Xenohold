@@ -33,16 +33,16 @@ public class UserInput : MonoBehaviour {
         Vector3 movement = new Vector3(0, 0, 0);
 
         //horizontal movement
-        if(xpos >= 0 && xpos < scrollWidth) {
+        if((xpos >= 0 && xpos < scrollWidth) || Input.GetKey(KeyCode.A)) {
             movement.x -= scrollSpeed;
-        }else if(xpos <= Screen.width && xpos > Screen.width - scrollWidth) {
+        }else if((xpos <= Screen.width && xpos > Screen.width - scrollWidth) || Input.GetKey(KeyCode.D)) {
             movement.x += scrollSpeed;
         }
 
         //vertical movement
-        if(ypos >= 0 && ypos < scrollWidth) {
+        if((ypos >= 0 && ypos < scrollWidth) || Input.GetKey(KeyCode.S)) {
             movement.z -= scrollSpeed;
-        }else if(ypos <= Screen.height && ypos > Screen.height - scrollWidth) {
+        }else if((ypos <= Screen.height && ypos > Screen.height - scrollWidth) || Input.GetKey(KeyCode.W)) {
             movement.z += scrollSpeed;
         }
 
