@@ -94,19 +94,26 @@ public class UserInput : MonoBehaviour {
     }
 
     private void LeftMouseClick() {
-        if(player.useGUILayout.MouseInBounds()) {
+        if(player.ui.MouseInBounds()) {
             GameObject hitObject = FindHitObject();
             Vector3 hitPoint = FindHitPoint();
             if(hitObject && hitPoint != ResourceManager.InvalidPosition) {
-                if (player.SelectedObject) player.SelectedObject.MouseClick(hitObject, hitPoint, player);
-                else if(hitObject.name != "Ground") {
+                if (player.SelectedObject) {
+                    player.SelectedObject.MouseClick(hitObject, hitPoint, player);
+                } else if (hitObject.name != "Ground") {
                     WorldObject worldObject = hitObject.transform.root.GetComponent<WorldObject>();
-                    if(worldObject) {
+                    if (worldObject) {
                         player.SelectedObject = worldObject;
                         worldObject.SetSelection(true);
                     }
                 }
             }
+        }
+    }
+
+    private void RightMouseClick() {
+        if(player.ui.MouseInBounds() && player.SelectedObject) {
+            print("RIGHT-CLICK with: " + player.SelectedObject.name);
         }
     }
 

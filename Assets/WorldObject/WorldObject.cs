@@ -43,9 +43,15 @@ public class WorldObject : MonoBehaviour {
     }
 
     public virtual void MouseClick(GameObject hitObject, Vector3 hitPoint, Player controller) {
-        if(currentlySelected && hitObject && hitObject.name != "Ground") {
-            WorldObject worldObject = hitObject.transform.root.GetComponent<WorldObject>();
-            if (worldObject) ChangeSelection(worldObject, controller);
+        if(currentlySelected && hitObject) {
+            if(hitObject.name != "Ground") {
+                WorldObject worldObject = hitObject.transform.root.GetComponent<WorldObject>();
+                if (worldObject) ChangeSelection(worldObject, controller);
+            } else {
+                //Deselect if left clicking the ground
+                controller.SelectedObject.SetSelection(false);
+                controller.SelectedObject = null;
+            }
         }
     }
 
