@@ -104,7 +104,7 @@ public class UserInput : MonoBehaviour {
                     WorldObject worldObject = hitObject.transform.root.GetComponent<WorldObject>();
                     if (worldObject) {
                         player.SelectedObject = worldObject;
-                        worldObject.SetSelection(true);
+                        worldObject.SetSelection(true, player.ui.GetPlayingArea());
                     }
                 }
             }

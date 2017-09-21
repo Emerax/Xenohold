@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using RTS;
 
 public class UI : MonoBehaviour {
-    public GUISkin resourceSkin, ordersSkin;
+    public GUISkin resourceSkin, ordersSkin, selectBoxSkin;
     public Player player;
 
     private const int ORDERS_BAR_WIDTH = 150, RESOURCE_BAR_HEIGHT = 40, SELECTION_NAME_HEIGHT = 15;
@@ -11,7 +12,7 @@ public class UI : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         player = transform.root.GetComponent<Player>();
-		
+        ResourceManager.StoreSelectBoxItems(selectBoxSkin);
 	}
 
 	void OnGUI () {
@@ -48,5 +49,9 @@ public class UI : MonoBehaviour {
         bool insideWidth = mousePos.x >= 0 && mousePos.x <= Screen.width - ORDERS_BAR_WIDTH;
         bool insideHeight = mousePos.y >= 0 && mousePos.y <= Screen.height - RESOURCE_BAR_HEIGHT;
         return insideWidth && insideHeight;
+    }
+
+    public Rect GetPlayingArea() {
+        return new Rect(0, RESOURCE_BAR_HEIGHT, Screen.width - ORDERS_BAR_WIDTH, Screen.height - RESOURCE_BAR_HEIGHT);
     }
 }
