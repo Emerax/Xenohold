@@ -47,4 +47,9 @@ public class Unit : WorldObject {
             }
         }
     }
+
+    private void StartMove(Vector3 destination) {
+        //TODO: Call CalculateBounds here or in submethods whenever position or rotation of unit has changed
+        print("Moving to" + destination);
+    }
 }
