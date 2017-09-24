@@ -53,10 +53,21 @@ public class WorldObject : MonoBehaviour {
 
     }
 
+    public virtual void SetHoverState(GameObject hoverObject) {
+        //only handle for human player, if and when they have something selected
+        if(player && player.human && currentlySelected) {
+            if(hoverObject.name != "Ground") {
+                player.ui.SetCursorState(CursorState.Select);
+            }else {
+                player.ui.SetCursorState(CursorState.Idle);
+            }
+        }
+    }
+
     public virtual void MouseClick(GameObject hitObject, Vector3 hitPoint, Player controller) {
         if(currentlySelected && hitObject) {
             if(hitObject.name != "Ground") {
-                WorldObject worldObject = hitObject.transform.root.GetComponent<WorldObject>();
+                WorldObject worldObject = hitObject.transform.parent.GetComponent<WorldObject>();
                 if (worldObject) ChangeSelection(worldObject, controller);
             } else {
                 //Deselect if left clicking the ground
