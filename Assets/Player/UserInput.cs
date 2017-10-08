@@ -5,18 +5,18 @@ using RTS;
 
 public class UserInput : MonoBehaviour {
 
-    public float panWidth = 15;
+    public float panWidth = 30;
     public float panSpeed = 25;
-    public bool panning = false;
     public float rotateAmount = 10;
     public float rotateSpeed = 100;
     public float minCameraHeight = 10;
     public float maxCameraHeight = 40;
 
     private Player player;
+    private bool panning = false;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         player = transform.root.GetComponent<Player>();
 		
 	}
