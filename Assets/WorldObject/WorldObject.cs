@@ -40,6 +40,10 @@ public class WorldObject : MonoBehaviour {
         GUI.Box(selectBox, "");
     }
 
+    protected virtual void RightClickGround(Vector3 hitPoint) {
+
+    }
+
     public void SetSelection(bool selected, Rect playingArea) {
         currentlySelected = selected;
         if (selected) this.playingArea = playingArea;
@@ -73,6 +77,21 @@ public class WorldObject : MonoBehaviour {
                 //Deselect if left clicking the ground
                 controller.SelectedObject.SetSelection(false, playingArea);
                 controller.SelectedObject = null;
+            }
+        }
+    }
+
+    /**
+     * Define behaviour for the selected worldobject on a right-click. Default checks if the ground or another object was clicked
+     * and calls the corresponding RightClickGround or RightClickObject methods.
+     */
+    public virtual void RightClick(GameObject hitObject, Vector3 hitPoint, Player controller) {
+        //Only the owner should be able to order the object
+        if(player && player.human && currentlySelected && hitObject && controller == player) {
+            if(hitObject.name != "Ground") {
+                print(this + " is right clicking " + hitObject + " but no consequence is implemented D:");
+            } else {
+                RightClickGround(hitPoint);
             }
         }
     }

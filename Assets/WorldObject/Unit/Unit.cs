@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using RTS;
+using UnityEngine.AI;
 
 public class Unit : WorldObject {
     public float moveSpeed, rotateSpeed;
+
+    private NavMeshAgent agent;
 
     protected override void Awake() {
         base.Awake();
@@ -13,6 +16,7 @@ public class Unit : WorldObject {
     // Use this for initialization
     protected override void Start () {
         base.Start();
+        agent = GetComponent<NavMeshAgent>();
 	}
 	
 	// Update is called once per frame
@@ -22,6 +26,9 @@ public class Unit : WorldObject {
 
     protected override void OnGUI() {
         base.OnGUI();
+        if(player && player.human && currentlySelected) {
+            CalculateBounds();
+        }
     }
 
     public override void SetHoverState(GameObject hoverObject) {
@@ -48,8 +55,19 @@ public class Unit : WorldObject {
         }
     }
 
+    public override void RightClick(GameObject hitObject, Vector3 hitPoint, Player controller) {
+        base.RightClick(hitObject, hitPoint, controller);
+    }
+
+    protected override void RightClickGround(Vector3 hitPoint) {
+        base.RightClickGround(hitPoint);
+        //Units should move to the selected location when having the ground right-clicked.
+        StartMove(hitPoint);
+    }
+
     private void StartMove(Vector3 destination) {
         //TODO: Call CalculateBounds here or in submethods whenever position or rotation of unit has changed
         print("Moving to" + destination);
+        agent.SetDestination(destination);
     }
 }

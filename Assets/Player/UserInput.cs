@@ -128,7 +128,11 @@ public class UserInput : MonoBehaviour {
 
     private void RightMouseClick() {
         if(player.ui.MouseInBounds() && player.SelectedObject) {
-            print("RIGHT-CLICK with: " + player.SelectedObject.name);
+            GameObject hitObject = FindHitObject();
+            Vector3 hitPoint = FindHitPoint();
+            if(hitObject && hitPoint != ResourceManager.InvalidPosition) {
+                player.SelectedObject.RightClick(hitObject, hitPoint, player);
+            }
         }
     }
 
