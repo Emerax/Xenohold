@@ -10,6 +10,8 @@ namespace RTS {
         private static GUISkin selectBoxSkin;
         public static GUISkin SelectBoxSkin { get { return selectBoxSkin; } }
 
+        public static GameObject[] unitList;
+
         public static void StoreSelectBoxItems(GUISkin skin) {
             selectBoxSkin = skin;
         }

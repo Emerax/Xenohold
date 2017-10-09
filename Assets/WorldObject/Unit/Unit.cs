@@ -8,6 +8,7 @@ public class Unit : WorldObject {
     public float moveSpeed, rotateSpeed;
 
     private NavMeshAgent agent;
+    private bool carrying = false;
 
     protected override void Awake() {
         base.Awake();
@@ -36,6 +37,12 @@ public class Unit : WorldObject {
         if(player && player.human && currentlySelected) {
             if(hoverObject.name == "Ground") {
                 player.ui.SetCursorState(CursorState.Move);
+            } else {
+                print("BefORE");
+                Ore ore = hoverObject.transform.parent.GetComponent<Ore>();
+                if(ore && ore.Uncarried()) {
+                    player.ui.SetCursorState(CursorState.PickUp);
+                }
             }
         }
     }
