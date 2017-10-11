@@ -5,10 +5,12 @@ using RTS;
 using UnityEngine.AI;
 
 public class Unit : WorldObject {
-    public float moveSpeed, rotateSpeed;
+    public float pickUpDistance;
 
     private NavMeshAgent agent;
     private bool carrying = false;
+    private Order currentOrder = Order.NONE;
+    private WorldObject target;
 
     protected override void Awake() {
         base.Awake();
@@ -23,6 +25,15 @@ public class Unit : WorldObject {
 	// Update is called once per frame
 	protected override void Update () {
         base.Update();
+        switch (currentOrder) {
+            case Order.PICK_UP:
+                if(DistanceToTarget() <= pickUpDistance) {
+                    print("UNIT HAS REACHED THE ORE!");
+                }
+                break;
+            default:
+                break;
+        }
 	}
 
     protected override void OnGUI() {
@@ -32,15 +43,18 @@ public class Unit : WorldObject {
         }
     }
 
+    protected virtual float DistanceToTarget() {
+        return Vector3.Distance(gameObject.transform.position, target.gameObject.transform.position);
+    }
+
     public override void SetHoverState(GameObject hoverObject) {
         base.SetHoverState(hoverObject);
         if(player && player.human && currentlySelected) {
             if(hoverObject.name == "Ground") {
                 player.ui.SetCursorState(CursorState.Move);
             } else {
-                print("BefORE");
                 Ore ore = hoverObject.transform.parent.GetComponent<Ore>();
-                if(ore && ore.Uncarried()) {
+                if (ore && ore.Uncarried()) {
                     player.ui.SetCursorState(CursorState.PickUp);
                 }
             }
@@ -64,6 +78,10 @@ public class Unit : WorldObject {
 
     public override void RightClick(GameObject hitObject, Vector3 hitPoint, Player controller) {
         base.RightClick(hitObject, hitPoint, controller);
+        Ore ore = hitObject.transform.parent.GetComponent<Ore>();
+        if(ore && ore.Uncarried()) {
+            BeginPickUp(ore);
+        }
     }
 
     protected override void RightClickGround(Vector3 hitPoint) {
@@ -73,8 +91,15 @@ public class Unit : WorldObject {
     }
 
     private void StartMove(Vector3 destination) {
-        //TODO: Call CalculateBounds here or in submethods whenever position or rotation of unit has changed
-        print("Moving to" + destination);
         agent.SetDestination(destination);
+    }
+
+    /**
+     * Unit is ordered to to pick upp the chosen ore object
+     */
+    private void BeginPickUp(Ore ore) {
+        currentOrder = Order.PICK_UP;
+        target = ore;
+        agent.SetDestination(ore.gameObject.transform.position);
     }
 }

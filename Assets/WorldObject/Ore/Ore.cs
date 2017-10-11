@@ -11,11 +11,15 @@ public class Ore : WorldObject {
 	// Use this for initialization
 	protected override void Start () {
         base.Start();
+        CalculateBounds();
 	}
 	
 	// Update is called once per frame
 	protected override void Update () {
         base.Update();
+        if (carrier) {
+            CalculateBounds();
+        }
 	}
 
     public void OnPickUp(Unit pickerUper) {
@@ -30,6 +34,6 @@ public class Ore : WorldObject {
      * Returns true if ore is currently not carried by a unit
      */
     public bool Uncarried() {
-        return carrier;
+        return !carrier;
     }
 }

@@ -5,4 +5,5 @@ using UnityEngine;
 namespace RTS {
     public enum CursorState {Idle, Select, Move, Attack, PanLeft, PanRight, PanUp, PanDown, PickUp}
     public enum OreType {Green, Red, Purple, Blue}
+    public enum Order {MOVE, ATTACK, PICK_UP, NONE}
 }
