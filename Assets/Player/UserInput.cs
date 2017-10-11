@@ -118,8 +118,16 @@ public class UserInput : MonoBehaviour {
                 } else if (hitObject.name != "Ground") {
                     WorldObject worldObject = hitObject.transform.parent.GetComponent<WorldObject>();
                     if (worldObject) {
-                        player.SelectedObject = worldObject;
-                        worldObject.SetSelection(true, player.ui.GetPlayingArea());
+                        if(worldObject is Ore) {
+                            Ore ore = (Ore)worldObject;
+                            if (!ore.Uncarried()) {
+                                player.SelectedObject = ore.GetCarrier();
+                                worldObject.SetSelection(true, player.ui.GetPlayingArea());
+                            }
+                        } else {
+                            player.SelectedObject = worldObject;
+                            worldObject.SetSelection(true, player.ui.GetPlayingArea());
+                        }
                     }
                 }
             }

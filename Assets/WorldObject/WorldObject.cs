@@ -57,6 +57,9 @@ public class WorldObject : MonoBehaviour {
 
     }
 
+    /**
+     * Sets the mouse cursor depending on the state of this worldobject, and what the cursor hovers over.
+     */
     public virtual void SetHoverState(GameObject hoverObject) {
         //only handle for human player, if and when they have something selected
         if(player && player.human && currentlySelected) {
@@ -89,7 +92,6 @@ public class WorldObject : MonoBehaviour {
         //Only the owner should be able to order the object
         if(player && player.human && currentlySelected && hitObject && controller == player) {
             if(hitObject.name != "Ground") {
-                print(this + " is right clicking " + hitObject + " but no consequence is implemented D:");
             } else {
                 RightClickGround(hitPoint);
             }
@@ -97,10 +99,19 @@ public class WorldObject : MonoBehaviour {
     }
 
     private void ChangeSelection(WorldObject worldObject, Player controller) {
+        WorldObject newSelection = worldObject;
+        if(worldObject is Ore) {
+            print("CLICKED ORE");
+            Ore ore = (Ore)worldObject;
+            if (!ore.Uncarried()) {
+                print("IT WAS CARRIED");
+                newSelection = ore.GetCarrier();
+            }
+        }
         SetSelection(false, playingArea);
         if (controller.SelectedObject) controller.SelectedObject.SetSelection(false, playingArea);
-        controller.SelectedObject = worldObject;
-        worldObject.SetSelection(true, controller.ui.GetPlayingArea());
+        controller.SelectedObject = newSelection;
+        newSelection.SetSelection(true, controller.ui.GetPlayingArea());
     }
 
     private void DrawSelection() {

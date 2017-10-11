@@ -30,6 +30,10 @@ public class Ore : WorldObject {
         carrier = null;
     }
 
+    public Unit GetCarrier() {
+        return carrier;
+    }
+
     /**
      * Returns true if ore is currently not carried by a unit
      */

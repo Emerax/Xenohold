@@ -27,8 +27,12 @@ public class Unit : WorldObject {
         base.Update();
         switch (currentOrder) {
             case Order.PICK_UP:
-                if(DistanceToTarget() <= pickUpDistance) {
-                    print("UNIT HAS REACHED THE ORE!");
+                Ore ore = (Ore)target;
+                if(ore && ore.Uncarried()) {
+                    if(DistanceToTarget() <= pickUpDistance) {
+                        PickUp(ore);
+                        ClearOrder();
+                    }
                 }
                 break;
             default:
@@ -47,6 +51,24 @@ public class Unit : WorldObject {
         return Vector3.Distance(gameObject.transform.position, target.gameObject.transform.position);
     }
 
+    /**
+     * Places ore on top of units head, and attaches it to units transform, making it follow.
+     */
+    protected virtual void PickUp(Ore ore) {
+        Vector3 uPos = transform.position;
+        Vector3 attachPos = new Vector3(uPos.x, transform.localScale.y + ore.transform.localScale.y / 2, uPos.z);
+        ore.transform.position = attachPos;
+        ore.transform.parent = transform;
+
+        ore.OnPickUp(this);
+        carrying = true;
+    }
+
+    protected virtual void ClearOrder() {
+        target = null;
+        currentOrder = Order.NONE;
+    }
+
     public override void SetHoverState(GameObject hoverObject) {
         base.SetHoverState(hoverObject);
         if(player && player.human && currentlySelected) {
@@ -57,21 +79,6 @@ public class Unit : WorldObject {
                 if (ore && ore.Uncarried()) {
                     player.ui.SetCursorState(CursorState.PickUp);
                 }
-            }
-        }
-    }
-
-    public override void MouseClick(GameObject hitObject, Vector3 hitPoint, Player controller) {
-        base.MouseClick(hitObject, hitPoint, controller);
-        //Only handle for human players, if player is owner and this unit is currently selected
-        if(player && player.human && currentlySelected) {
-            if(hitObject.name == "Ground" && hitPoint != ResourceManager.InvalidPosition) {
-                float x = hitPoint.x;
-                //Unit y is actually in the middle of the unit, this has to be added to the zero-level or unit will sink into the ground...
-                float y = hitPoint.y + player.SelectedObject.transform.position.y;
-                float z = hitPoint.z;
-                Vector3 destination = new Vector3(x, y, z);
-                StartMove(destination);
             }
         }
     }
