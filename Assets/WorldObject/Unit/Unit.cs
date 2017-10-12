@@ -27,10 +27,9 @@ public class Unit : WorldObject {
         base.Update();
         switch (currentOrder) {
             case Order.PICK_UP:
-                Ore ore = (Ore)target;
-                if(ore && ore.Uncarried()) {
+                if(target is Ore && !(target as Ore).carrier) {
                     if(DistanceToTarget() <= pickUpDistance) {
-                        PickUp(ore);
+                        PickUp(target as Ore);
                         ClearOrder();
                     }
                 }
@@ -69,29 +68,26 @@ public class Unit : WorldObject {
         currentOrder = Order.NONE;
     }
 
-    public override void SetHoverState(GameObject hoverObject) {
-        base.SetHoverState(hoverObject);
-        if(player && player.human && currentlySelected) {
-            if(hoverObject.name == "Ground") {
-                player.ui.SetCursorState(CursorState.Move);
-            } else {
-                Ore ore = hoverObject.transform.parent.GetComponent<Ore>();
-                if (ore && ore.Uncarried()) {
-                    player.ui.SetCursorState(CursorState.PickUp);
-                }
-            }
+    public override void SetHoverState(WorldObject worldObject) {
+        base.SetHoverState(worldObject);
+        if(worldObject is Ore && !(worldObject as Ore).carrier) {
+            player.ui.SetCursorState(CursorState.PickUp);
         }
     }
 
-    public override void RightClick(GameObject hitObject, Vector3 hitPoint, Player controller) {
-        base.RightClick(hitObject, hitPoint, controller);
-        Ore ore = hitObject.transform.parent.GetComponent<Ore>();
-        if(ore && ore.Uncarried()) {
-            BeginPickUp(ore);
+    public override void SetGroundHoverState() {
+        base.SetGroundHoverState();
+        player.ui.SetCursorState(CursorState.Move);
+    }
+
+    public override void RightClickObject(WorldObject worldObject) {
+        base.RightClickObject(worldObject);
+        if(worldObject is Ore && !(worldObject as Ore).carrier) {
+            BeginPickUp(worldObject as Ore);
         }
     }
 
-    protected override void RightClickGround(Vector3 hitPoint) {
+    public override void RightClickGround(Vector3 hitPoint) {
         base.RightClickGround(hitPoint);
         //Units should move to the selected location when having the ground right-clicked.
         StartMove(hitPoint);

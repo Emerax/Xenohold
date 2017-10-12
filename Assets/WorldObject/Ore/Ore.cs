@@ -6,7 +6,7 @@ using RTS;
 public class Ore : WorldObject {
 
     public OreType type;
-    private Unit carrier;
+    public Unit carrier { get; set; }
 
 	// Use this for initialization
 	protected override void Start () {
@@ -28,16 +28,5 @@ public class Ore : WorldObject {
 
     public void OnDrop() {
         carrier = null;
-    }
-
-    public Unit GetCarrier() {
-        return carrier;
-    }
-
-    /**
-     * Returns true if ore is currently not carried by a unit
-     */
-    public bool Uncarried() {
-        return !carrier;
     }
 }

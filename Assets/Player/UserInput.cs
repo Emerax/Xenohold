@@ -104,7 +104,7 @@ public class UserInput : MonoBehaviour {
 
     private void MouseActivity() {
         if (Input.GetMouseButtonDown(0)) LeftMouseClick();
-        else if (Input.GetMouseButtonDown(1)) RightMouseClick();
+        else if (Input.GetMouseButtonDown(1) && player.SelectedObject) RightMouseClick();
         MouseHover();
     }
 
@@ -113,22 +113,17 @@ public class UserInput : MonoBehaviour {
             GameObject hitObject = FindHitObject();
             Vector3 hitPoint = FindHitPoint();
             if(hitObject && hitPoint != ResourceManager.InvalidPosition) {
-                if (player.SelectedObject) {
-                    player.SelectedObject.MouseClick(hitObject, hitPoint, player);
-                } else if (hitObject.name != "Ground") {
+                if(hitObject.name != "Ground") {
                     WorldObject worldObject = hitObject.transform.parent.GetComponent<WorldObject>();
-                    if (worldObject) {
-                        if(worldObject is Ore) {
-                            Ore ore = (Ore)worldObject;
-                            if (!ore.Uncarried()) {
-                                player.SelectedObject = ore.GetCarrier();
-                                worldObject.SetSelection(true, player.ui.GetPlayingArea());
-                            }
-                        } else {
-                            player.SelectedObject = worldObject;
-                            worldObject.SetSelection(true, player.ui.GetPlayingArea());
-                        }
+                    if(worldObject && worldObject is Ore && (worldObject as Ore).carrier) {
+                        worldObject = (worldObject as Ore).carrier;
                     }
+                    if (worldObject && worldObject.GetOwner() && worldObject.GetOwner().Equals(player)) {
+                        player.SelectObject(worldObject);
+                    }
+                } else {
+                    //Deselect everything on left-clicking the ground
+                    player.Deselect();
                 }
             }
         }
@@ -139,7 +134,18 @@ public class UserInput : MonoBehaviour {
             GameObject hitObject = FindHitObject();
             Vector3 hitPoint = FindHitPoint();
             if(hitObject && hitPoint != ResourceManager.InvalidPosition) {
-                player.SelectedObject.RightClick(hitObject, hitPoint, player);
+                if(hitObject.name != "Ground") {
+                    WorldObject worldObject = hitObject.transform.parent.GetComponent<WorldObject>();
+                    if (worldObject) {
+                        player.SelectedObject.RightClickObject(worldObject);
+                    } else {
+                        Debug.LogError("RightMouseClick received a non-Ground, non-worldObject hitObject: " + hitObject);
+                    }
+                } else {
+                    if (player.SelectedObject) {
+                        player.SelectedObject.RightClickGround(hitPoint);
+                    } 
+                }
             }
         }
     }
@@ -159,18 +165,26 @@ public class UserInput : MonoBehaviour {
     }
 
     private void MouseHover() {
-        if (player.ui.MouseInBounds()) {
+        if (player.human && player.ui.MouseInBounds()) {
             GameObject hoverObject = FindHitObject();
             if (hoverObject) {
-                if (player.SelectedObject) player.SelectedObject.SetHoverState(hoverObject);
-                else if(hoverObject.name != "Ground") {
-                    Player owner = hoverObject.transform.root.GetComponent<Player>();
-                    if (owner) {
-                        Unit unit = hoverObject.transform.parent.GetComponent<Unit>();
-                        Building building = hoverObject.transform.parent.GetComponent<Building>();
-                        if(owner.username == player.username && (unit || building)) {
-                            player.ui.SetCursorState(CursorState.Select);
+                if(hoverObject.name != "Ground") {
+                    WorldObject worldObject = hoverObject.transform.parent.GetComponent<WorldObject>();
+                    if (worldObject) {
+                        if (player.SelectedObject) {
+                            player.SelectedObject.SetHoverState(worldObject);
+                        } else {
+                            player.ui.SetDefaultHoverState(worldObject);
                         }
+                    } else {
+                        Debug.LogError("MouseHover received non-Ground, non-WorldObject hoverObject: " + hoverObject);
+                    }
+                } else {
+                    if (player.SelectedObject) {
+                        player.SelectedObject.SetGroundHoverState();
+                    } else {
+                        //Hovering above ground with nothign selected
+                        player.ui.SetCursorState(CursorState.Idle);
                     }
                 }
             }

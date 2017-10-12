@@ -22,6 +22,25 @@ public class Player : MonoBehaviour {
 		
 	}
 
+    public void SelectObject(WorldObject worldObject) {
+        if (SelectedObject) {
+            SelectedObject.SetSelection(false, ui.GetPlayingArea());
+        }
+        if(worldObject is Ore && (worldObject as Ore).carrier) {
+            SelectedObject = (worldObject as Ore).carrier;
+        } else {
+            SelectedObject = worldObject;
+        }
+        SelectedObject.SetSelection(true, ui.GetPlayingArea());
+    }
+
+    public void Deselect() {
+        if (SelectedObject) {
+            SelectedObject.SetSelection(false, ui.GetPlayingArea());
+            SelectedObject = null;
+        }
+    }
+
     /**
      * Add a new unit to this player, spawning at spawnpoint
      */

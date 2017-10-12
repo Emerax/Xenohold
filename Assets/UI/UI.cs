@@ -125,4 +125,14 @@ public class UI : MonoBehaviour {
                 break;
         }
     }
+
+    public void SetDefaultHoverState(WorldObject worldObject) {
+        Player owner = worldObject.transform.root.GetComponent<Player>();
+        if (owner) {
+            if (owner.username == player.username) {
+                player.ui.SetCursorState(CursorState.Select);
+            }
+        }
+    }
+
 }
