@@ -17,12 +17,15 @@ public class UI : MonoBehaviour {
     private CursorState activeCursorState;
     private int currentFrame = 0;
 
+    void Awake() {
+        canvas = GetComponentInChildren<Canvas>();
+    }
+
 	// Use this for initialization
 	void Start () {
         player = transform.root.GetComponent<Player>();
         ResourceManager.StoreSelectBoxItems(selectBoxSkin);
         SetCursorState(CursorState.Idle);
-        canvas = GetComponentInChildren<Canvas>();
 	}
 
 	void OnGUI () {

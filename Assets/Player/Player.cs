@@ -12,9 +12,13 @@ public class Player : MonoBehaviour {
 
     public GameObject baseUnitPrefab;
 
+    void Awake() {
+        ui = GetComponentInChildren<UI>();
+    }
+
 	// Use this for initialization
 	void Start () {
-        ui = GetComponentInChildren<UI>();
+        
 	}
 	
 	// Update is called once per frame
