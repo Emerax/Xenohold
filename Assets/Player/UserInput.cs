@@ -103,8 +103,13 @@ public class UserInput : MonoBehaviour {
     }
 
     private void MouseActivity() {
-        if (Input.GetMouseButtonDown(0)) LeftMouseClick();
-        else if (Input.GetMouseButtonDown(1) && player.SelectedObject) RightMouseClick();
+        if (Input.GetMouseButtonDown(0)) {
+            LeftMouseClick();
+        } else if (Input.GetMouseButtonDown(1) && player.SelectedObject) {
+            RightMouseClick();
+        } else if (Input.GetMouseButtonDown(1)) {
+            player.AddUnit(FindHitPoint(), new Quaternion());
+        }
         MouseHover();
     }
 

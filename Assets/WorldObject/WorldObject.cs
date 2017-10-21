@@ -6,8 +6,6 @@ using RTS;
 public class WorldObject : MonoBehaviour {
 
     public string objectName;
-    public Texture2D buildImage;
-    public int cost, sellValue, hitPoints, maxHitPoints;
 
     protected Player player;
     protected string[] actions = { };
