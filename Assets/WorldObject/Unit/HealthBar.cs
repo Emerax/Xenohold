@@ -31,7 +31,7 @@ public class HealthBar : MonoBehaviour {
 	}
 
     public void OnHealthChange() {
-        image.fillAmount = unit.currentHealth / unit.maxHealth;
+        image.fillAmount = unit.currentHealth / (float)unit.maxHealth;
     }
 
     private bool IsOnScreen(Vector2 screenPos) {

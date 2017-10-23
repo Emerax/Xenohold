@@ -9,12 +9,16 @@ public class Unit : WorldObject {
     public float healthBarHoverDistance; //How far above the unit thea healthbar should be rendered.
     public GameObject healthBarObjectPrefab;
     public int maxHealth, currentHealth;
+    public int attackDamage;
+    public float attackRange;
+    public float attackCooldown; //time in seconds how long the unit must wait between each attack.
 
     private NavMeshAgent agent;
     private bool carrying = false;
     private Order currentOrder = Order.NONE;
     private WorldObject target;
     private HealthBar healthBar;
+    private float remainingCooldown = 0;
 
     protected override void Awake() {
         base.Awake();
@@ -36,12 +40,35 @@ public class Unit : WorldObject {
 	protected override void Update () {
         base.Update();
 
+        //Cooldown attack
+        if(remainingCooldown > 0) {
+            remainingCooldown -= Time.deltaTime;
+        }
+
         switch (currentOrder) {
+            case Order.MOVE:
+                if (agent.remainingDistance <= float.Epsilon) {
+                    currentOrder = Order.NONE;
+                }
+                break;
             case Order.PICK_UP:
                 if(target is Ore && !(target as Ore).carrier) {
                     if(DistanceToTarget() <= pickUpDistance) {
                         PickUp(target as Ore);
                         ClearOrder();
+                    }
+                }
+                break;
+            case Order.ATTACK:
+                if(target is Unit) {
+                    if(DistanceToTarget() <= attackRange) {
+                        if(remainingCooldown <= 0) {
+                            remainingCooldown = attackCooldown;
+                            Attack(target as Unit);
+                        }
+                    } else if(agent.destination != target.transform.position) {
+                        //Move into attack range
+                        agent.SetDestination(target.transform.position);
                     }
                 }
                 break;
@@ -86,9 +113,18 @@ public class Unit : WorldObject {
         carrying = false;
     }
 
+    protected virtual void Attack(Unit target) {
+        MeleeAttack(target);
+    }
+
     protected virtual void ClearOrder() {
         target = null;
         currentOrder = Order.NONE;
+    }
+
+    public virtual void TookDamage(int damage) {
+        currentHealth -= damage;
+        healthBar.OnHealthChange();
     }
 
     public virtual Vector3 GetHealthBarPos() {
@@ -115,6 +151,9 @@ public class Unit : WorldObject {
         base.RightClickObject(worldObject);
         if(worldObject is Ore && !(worldObject as Ore).carrier) {
             BeginPickUp(worldObject as Ore);
+        } else if (worldObject is Unit && !(worldObject as Unit).GetOwner().Equals(GetOwner())) {
+            //Right-clicking an enemy, KILL IT KILL IT DEAD
+            BeginAttack(worldObject as Unit);
         }
     }
 
@@ -125,7 +164,22 @@ public class Unit : WorldObject {
     }
 
     private void StartMove(Vector3 destination) {
+        target = null;
+        currentOrder = Order.MOVE;
         agent.SetDestination(destination);
+    }
+
+    /**
+     * Unit is ordered to attack the target.
+     * Will keep attempting to move within range of the target and attack it whenever possible.
+     */
+    private void BeginAttack(Unit target) {
+        this.target = target;
+        currentOrder = Order.ATTACK;
+    }
+
+    private void MeleeAttack(Unit target) {
+        target.TookDamage(attackDamage);
     }
 
     /**
