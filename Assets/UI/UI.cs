@@ -10,7 +10,10 @@ public class UI : MonoBehaviour {
     public Texture2D activeCursor;
     public Texture2D idleCursor, idleCursorSelect, panDownCursor, panLeftCursor, panRightCursor, panUpCursor;
     public Texture2D[] moveCursors, attackCursors, pickUpCursors;
+
     public Canvas canvas;
+    public RectTransform selectBox;
+    public Vector3 selectBoxScale = new Vector2(0, 0);
 
     private const int ORDERS_BAR_WIDTH = 150, RESOURCE_BAR_HEIGHT = 40, SELECTION_NAME_HEIGHT = 15;
     private Vector2 zv = new Vector2(0, 0);
@@ -29,12 +32,18 @@ public class UI : MonoBehaviour {
 	}
 
 	void OnGUI () {
+
 		if(player && player.human) {
+            UpdateSelectionBox();
             DrawOrdersBar();
             DrawResourceBar();
             DrawMouseCursor();
         }
 	}
+
+    private void UpdateSelectionBox() {
+        selectBox.localScale = selectBoxScale;
+    }
 
     private void DrawOrdersBar() {
         GUI.skin = ordersSkin;

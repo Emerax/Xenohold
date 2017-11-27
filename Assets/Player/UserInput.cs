@@ -15,6 +15,10 @@ public class UserInput : MonoBehaviour {
     private Player player;
     private bool panning = false;
 
+    private Vector3 selectPos;
+    public Rect selectRect;
+    public bool selecting;
+
     // Use this for initialization
     void Start () {
         player = transform.root.GetComponent<Player>();
@@ -103,6 +107,21 @@ public class UserInput : MonoBehaviour {
     }
 
     private void MouseActivity() {
+        if (selecting) {
+            Vector2 topLeft = Vector3.Min(selectPos, Input.mousePosition);
+            Vector2 bottomRight = Vector3.Max(selectPos, Input.mousePosition);
+            selectRect = Rect.MinMaxRect(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
+        }
+        if (Input.GetMouseButtonUp(0)) {
+            selecting = false;
+            //call multi-select method on current selectRect
+            //Hide selectbox when mouse is released, ui script will make it visible again next time selecting is true
+            player.ui.selectBox.localScale = new Vector3(0, 0, 0);
+        }
+        if (Input.GetMouseButtonDown(0)) {
+            selectPos = Input.mousePosition;
+            selecting = true;
+        }
         if (Input.GetMouseButtonDown(0)) {
             LeftMouseClick();
         } else if (Input.GetMouseButtonDown(1) && player.SelectedObject) {
