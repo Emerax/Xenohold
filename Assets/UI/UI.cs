@@ -12,8 +12,10 @@ public class UI : MonoBehaviour {
     public Texture2D[] moveCursors, attackCursors, pickUpCursors;
 
     public Canvas canvas;
+    public RectTransform passiveElements;
     public RectTransform selectBox;
     public Vector3 selectBoxScale = new Vector2(0, 0);
+    public Vector2 selectBoxPos = Vector2.zero;
 
     private const int ORDERS_BAR_WIDTH = 150, RESOURCE_BAR_HEIGHT = 40, SELECTION_NAME_HEIGHT = 15;
     private Vector2 zv = new Vector2(0, 0);
@@ -42,7 +44,8 @@ public class UI : MonoBehaviour {
 	}
 
     private void UpdateSelectionBox() {
-        selectBox.localScale = selectBoxScale;
+        selectBox.sizeDelta = selectBoxScale;
+        selectBox.anchoredPosition = selectBoxPos;
     }
 
     private void DrawOrdersBar() {

@@ -15,8 +15,10 @@ public class UserInput : MonoBehaviour {
     private Player player;
     private bool panning = false;
 
+    /// <summary>
+    /// When the player begins to draw a selection box, this value is the pont where the mouse was first pressed down.
+    /// </summary>
     private Vector3 selectPos;
-    public Rect selectRect;
     public bool selecting;
 
     // Use this for initialization
@@ -108,21 +110,26 @@ public class UserInput : MonoBehaviour {
 
     private void MouseActivity() {
         if (selecting) {
-            Vector2 topLeft = Vector3.Min(selectPos, Input.mousePosition);
-            Vector2 bottomRight = Vector3.Max(selectPos, Input.mousePosition);
-            selectRect = Rect.MinMaxRect(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
+            Vector2 pos1, pos2;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(player.ui.passiveElements, selectPos, null, out pos1);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(player.ui.passiveElements, Input.mousePosition, null, out pos2);
+
+            Rect mouseMovementRect = CalculateMouseMovementRect(pos1, pos2);
+            player.ui.selectBoxScale = mouseMovementRect.size;
+            player.ui.selectBoxPos = mouseMovementRect.center;
         }
         if (Input.GetMouseButtonUp(0)) {
+            print("LEFT UP");
             selecting = false;
             //call multi-select method on current selectRect
-            //Hide selectbox when mouse is released, ui script will make it visible again next time selecting is true
-            player.ui.selectBox.localScale = new Vector3(0, 0, 0);
+            //Make select box size zero to effectively remove it while we are not selecting anything.
+            player.ui.selectBoxScale = Vector2.zero;
         }
         if (Input.GetMouseButtonDown(0)) {
+            print("LEFT DOWN!");
             selectPos = Input.mousePosition;
             selecting = true;
-        }
-        if (Input.GetMouseButtonDown(0)) {
+
             LeftMouseClick();
         } else if (Input.GetMouseButtonDown(1) && player.SelectedObject) {
             RightMouseClick();
@@ -130,6 +137,20 @@ public class UserInput : MonoBehaviour {
             player.AddUnit(FindHitPoint(), new Quaternion());
         }
         MouseHover();
+    }
+
+    /// <summary>
+    /// Given two points on the screen, calculates the Rect formed with them as diametrically opposed corners.
+    /// </summary>
+    private Rect CalculateMouseMovementRect(Vector2 pos1, Vector2 pos2) {
+        //Screen and Rect coordinate systems use opposite y-values, flip them to create the correct Rect.
+        //pos1.y = Screen.height - pos1.y;
+        //pos2.y = Screen.height - pos2.y;
+
+        Vector2 topLeft = Vector2.Min(pos1, pos2);
+        Vector2 bottomRight = Vector2.Max(pos1, pos2);
+
+        return Rect.MinMaxRect(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
     }
 
     private void LeftMouseClick() {

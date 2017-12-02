@@ -30,7 +30,7 @@ public class Unit : WorldObject {
         agent = GetComponent<NavMeshAgent>();
 
         //Initiate the unit's health bar.
-        Transform parent = GetOwner().ui.canvas.gameObject.transform.Find("HealthBarRect");
+        Transform parent = GetOwner().ui.canvas.gameObject.transform.Find("PassiveElementsRect");
         GameObject newBar = Instantiate(healthBarObjectPrefab, parent);
         newBar.GetComponent<HealthBar>().unit = this;
         healthBar = newBar.GetComponent<HealthBar>();
