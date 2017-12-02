@@ -37,7 +37,6 @@ public class UI : MonoBehaviour {
 
 		if(player && player.human) {
             UpdateSelectionBox();
-            DrawOrdersBar();
             DrawResourceBar();
             DrawMouseCursor();
         }
@@ -46,21 +45,6 @@ public class UI : MonoBehaviour {
     private void UpdateSelectionBox() {
         selectBox.sizeDelta = selectBoxScale;
         selectBox.anchoredPosition = selectBoxPos;
-    }
-
-    private void DrawOrdersBar() {
-        GUI.skin = ordersSkin;
-        GUI.BeginGroup(new Rect(Screen.width - ORDERS_BAR_WIDTH, RESOURCE_BAR_HEIGHT, ORDERS_BAR_WIDTH, Screen.height - RESOURCE_BAR_HEIGHT));
-        GUI.Box(new Rect(0, 0, ORDERS_BAR_WIDTH, Screen.height - RESOURCE_BAR_HEIGHT), "");
-
-        string selectionName = "";
-        if (player.SelectedObject) {
-            selectionName = player.SelectedObject.objectName;
-        }
-        if (!selectionName.Equals("")) {
-            GUI.Label(new Rect(0, 10, ORDERS_BAR_WIDTH, SELECTION_NAME_HEIGHT), selectionName);
-        }
-        GUI.EndGroup();
     }
 
     private void DrawResourceBar() {

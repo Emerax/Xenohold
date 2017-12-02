@@ -8,12 +8,15 @@ public class Player : MonoBehaviour {
     public string username;
     public bool human;
     public UI ui;
-    public WorldObject SelectedObject { get; set; }
+    public List<Unit> ownedUnits;
+    public List<Unit> selectedUnits;
 
     public GameObject baseUnitPrefab;
 
     void Awake() {
         ui = GetComponentInChildren<UI>();
+        //Add all editor-placed units to the list of owned ones.
+        foreach(Unit unit in GetComponentsInChildren<Unit>()) { ownedUnits.Add(unit); }
     }
 
 	// Use this for initialization
@@ -26,22 +29,26 @@ public class Player : MonoBehaviour {
 		
 	}
 
-    public void SelectObject(WorldObject worldObject) {
-        if (SelectedObject) {
-            SelectedObject.SetSelection(false, ui.GetPlayingArea());
-        }
-        if(worldObject is Ore && (worldObject as Ore).carrier) {
-            SelectedObject = (worldObject as Ore).carrier;
+    public void SelectUnits(List<Unit> units) {
+        if (selectedUnits.Count > 0) {
+            foreach (Unit unit in selectedUnits) {
+                unit.SetSelection(false, ui.GetPlayingArea());
+            }
+            selectedUnits.Clear();
         } else {
-            SelectedObject = worldObject;
+            selectedUnits = units;
+            foreach (Unit unit in selectedUnits) {
+                unit.SetSelection(true, ui.GetPlayingArea());
+            }
         }
-        SelectedObject.SetSelection(true, ui.GetPlayingArea());
     }
 
     public void Deselect() {
-        if (SelectedObject) {
-            SelectedObject.SetSelection(false, ui.GetPlayingArea());
-            SelectedObject = null;
+        if (selectedUnits.Count > 0) {
+            foreach (Unit unit in selectedUnits) {
+                unit.SetSelection(false, ui.GetPlayingArea());
+            }
+            selectedUnits.Clear();
         }
     }
 
@@ -52,5 +59,6 @@ public class Player : MonoBehaviour {
         Units units = GetComponentInChildren<Units>();
         GameObject newUnit = (GameObject)Instantiate(baseUnitPrefab, spawnPoint, rotation);
         newUnit.transform.parent = units.transform; //add to this players units.
+        ownedUnits.Add(newUnit.GetComponentInChildren<Unit>());
     }
 }

@@ -84,6 +84,10 @@ public class Unit : WorldObject {
         }
     }
 
+    public bool InSelectionBounds(Bounds selectionBounds) {
+        return selectionBounds.Contains(Camera.main.WorldToViewportPoint(transform.position));
+    }
+
     protected virtual float DistanceToTarget() {
         return Vector3.Distance(gameObject.transform.position, target.gameObject.transform.position);
     }

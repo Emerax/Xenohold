@@ -121,7 +121,9 @@ public class UserInput : MonoBehaviour {
         if (Input.GetMouseButtonUp(0)) {
             print("LEFT UP");
             selecting = false;
-            //call multi-select method on current selectRect
+
+            SelectMultiple();
+
             //Make select box size zero to effectively remove it while we are not selecting anything.
             player.ui.selectBoxScale = Vector2.zero;
         }
@@ -131,7 +133,7 @@ public class UserInput : MonoBehaviour {
             selecting = true;
 
             LeftMouseClick();
-        } else if (Input.GetMouseButtonDown(1) && player.SelectedObject) {
+        } else if (Input.GetMouseButtonDown(1) && player.selectedUnits.Count > 0) {
             RightMouseClick();
         } else if (Input.GetMouseButtonDown(1)) {
             player.AddUnit(FindHitPoint(), new Quaternion());
@@ -143,14 +145,31 @@ public class UserInput : MonoBehaviour {
     /// Given two points on the screen, calculates the Rect formed with them as diametrically opposed corners.
     /// </summary>
     private Rect CalculateMouseMovementRect(Vector2 pos1, Vector2 pos2) {
-        //Screen and Rect coordinate systems use opposite y-values, flip them to create the correct Rect.
-        //pos1.y = Screen.height - pos1.y;
-        //pos2.y = Screen.height - pos2.y;
-
         Vector2 topLeft = Vector2.Min(pos1, pos2);
         Vector2 bottomRight = Vector2.Max(pos1, pos2);
 
         return Rect.MinMaxRect(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
+    }
+
+    /// <summary>
+    /// Find all owned units within the selection box and select them.
+    /// </summary>
+    private void SelectMultiple() {
+        player.SelectUnits(player.ownedUnits.FindAll(u => u.InSelectionBounds(GetViewPortBounds(selectPos, Input.mousePosition))));
+
+    }
+
+    private Bounds GetViewPortBounds(Vector2 screenPos1, Vector2 screenPos2) {
+        Vector3 v1 = Camera.main.ScreenToViewportPoint(screenPos1);
+        Vector3 v2 = Camera.main.ScreenToViewportPoint(screenPos2);
+        Vector3 min = Vector3.Min(v1, v2);
+        Vector3 max = Vector3.Max(v1, v2);
+        min.z = Camera.main.nearClipPlane;
+        max.z = Camera.main.farClipPlane;
+
+        Bounds bounds = new Bounds();
+        bounds.SetMinMax(min, max);
+        return bounds;
     }
 
     private void LeftMouseClick() {
@@ -163,8 +182,8 @@ public class UserInput : MonoBehaviour {
                     if(worldObject && worldObject is Ore && (worldObject as Ore).carrier) {
                         worldObject = (worldObject as Ore).carrier;
                     }
-                    if (worldObject && worldObject.GetOwner() && worldObject.GetOwner().Equals(player)) {
-                        player.SelectObject(worldObject);
+                    if (worldObject && worldObject is Unit && worldObject.GetOwner() && worldObject.GetOwner().Equals(player)) {
+                        player.SelectUnits(new List<Unit>(new Unit[] {worldObject as Unit})); //Dirty
                     }
                 } else {
                     //Deselect everything on left-clicking the ground
@@ -175,20 +194,24 @@ public class UserInput : MonoBehaviour {
     }
 
     private void RightMouseClick() {
-        if(player.ui.MouseInBounds() && player.SelectedObject) {
+        if(player.ui.MouseInBounds() && player.selectedUnits.Count > 0) {
             GameObject hitObject = FindHitObject();
             Vector3 hitPoint = FindHitPoint();
             if(hitObject && hitPoint != ResourceManager.InvalidPosition) {
                 if(hitObject.name != "Ground") {
                     WorldObject worldObject = hitObject.transform.parent.GetComponent<WorldObject>();
                     if (worldObject) {
-                        player.SelectedObject.RightClickObject(worldObject);
+                        foreach(Unit unit in player.selectedUnits) {
+                            unit.RightClickObject(worldObject);
+                        }
                     } else {
                         Debug.LogError("RightMouseClick received a non-Ground, non-worldObject hitObject: " + hitObject);
                     }
                 } else {
-                    if (player.SelectedObject) {
-                        player.SelectedObject.RightClickGround(hitPoint);
+                    if (player.selectedUnits.Count > 0) {
+                        foreach(Unit unit in player.selectedUnits) {
+                            unit.RightClickGround(hitPoint);
+                        }
                     } 
                 }
             }
@@ -216,8 +239,9 @@ public class UserInput : MonoBehaviour {
                 if(hoverObject.name != "Ground") {
                     WorldObject worldObject = hoverObject.transform.parent.GetComponent<WorldObject>();
                     if (worldObject) {
-                        if (player.SelectedObject) {
-                            player.SelectedObject.SetHoverState(worldObject);
+                        if (player.selectedUnits.Count > 0) {
+                            //First unit in selected list is leader, hopefully this leader is chosen in a sensible manner.
+                            player.selectedUnits[0].SetHoverState(worldObject);
                         } else {
                             player.ui.SetDefaultHoverState(worldObject);
                         }
@@ -225,8 +249,9 @@ public class UserInput : MonoBehaviour {
                         Debug.LogError("MouseHover received non-Ground, non-WorldObject hoverObject: " + hoverObject);
                     }
                 } else {
-                    if (player.SelectedObject) {
-                        player.SelectedObject.SetGroundHoverState();
+                    if (player.selectedUnits.Count > 0) {
+                        //First unit in selection list decides responses
+                        player.selectedUnits[0].SetGroundHoverState();
                     } else {
                         //Hovering above ground with nothign selected
                         player.ui.SetCursorState(CursorState.Idle);
