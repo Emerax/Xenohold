@@ -47,7 +47,7 @@ public class UserInput : MonoBehaviour {
             movement.x -= panSpeed;
             player.ui.SetCursorState(CursorState.PanLeft);
             panning = true;
-        }else if((xpos <= Screen.width && xpos > Screen.width - panWidth) || Input.GetKey(KeyCode.D)) {
+        }else if((xpos <= Screen.width && (xpos > Screen.width - panWidth) || Input.GetKey(KeyCode.D))) {
             movement.x += panSpeed;
             player.ui.SetCursorState(CursorState.PanRight);
             panning = true;
@@ -58,7 +58,7 @@ public class UserInput : MonoBehaviour {
             movement.z -= panSpeed;
             player.ui.SetCursorState(CursorState.PanDown);
             panning = true;
-        }else if((ypos <= Screen.height && ypos > Screen.height - panWidth) || Input.GetKey(KeyCode.W)) {
+        }else if((ypos <= Screen.height && (ypos > Screen.height - panWidth) || Input.GetKey(KeyCode.W))) {
             movement.z += panSpeed;
             player.ui.SetCursorState(CursorState.PanUp);
             panning = true;
@@ -99,7 +99,7 @@ public class UserInput : MonoBehaviour {
         Vector3 origin = Camera.main.transform.eulerAngles;
         Vector3 destination = origin;
         if (Input.GetMouseButton(2)) {
-            destination.x -= Input.GetAxis("Mouse Y") * rotateAmount;
+            //destination.x -= Input.GetAxis("Mouse X") * rotateAmount;
             destination.y += Input.GetAxis("Mouse X") * rotateAmount;
         }
 
