@@ -18,7 +18,7 @@ public class UI : MonoBehaviour {
     public Vector2 selectBoxPos = Vector2.zero;
 
     private const int ORDERS_BAR_WIDTH = 150, RESOURCE_BAR_HEIGHT = 40, SELECTION_NAME_HEIGHT = 15;
-    private Vector2 zv = new Vector2(0, 0);
+    private Vector2 hotSpot;
     private CursorState activeCursorState;
     private int currentFrame = 0;
 
@@ -58,10 +58,10 @@ public class UI : MonoBehaviour {
         //Mouse definitely is not on hud if it is panning the lower, or left edge.
         bool mouseOverHud = !MouseInBounds() && activeCursorState != CursorState.PanRight && activeCursorState != CursorState.PanUp;
         if (mouseOverHud) {
-            Cursor.SetCursor(idleCursor, zv, CursorMode.Auto);
+            Cursor.SetCursor(idleCursor, hotSpot, CursorMode.Auto);
         } else {
             UpdateCursorAnimation();
-            Cursor.SetCursor(activeCursor, zv, CursorMode.Auto);
+            Cursor.SetCursor(activeCursor, hotSpot, CursorMode.Auto);
         }
     }
 
@@ -94,33 +94,42 @@ public class UI : MonoBehaviour {
             switch (newState) {
             case CursorState.Idle:
                 activeCursor = idleCursor;
+                hotSpot = Vector2.zero;
                 break;
             case CursorState.Select:
                 activeCursor = idleCursorSelect;
+                hotSpot = Vector2.zero;
                 break;
             case CursorState.Attack:
                 currentFrame = (int)Time.time % attackCursors.Length;
                 activeCursor = attackCursors[currentFrame];
+                hotSpot = new Vector2(activeCursor.width / 2, activeCursor.height / 2);
                 break;
             case CursorState.PickUp:
                 currentFrame = (int)Time.time % pickUpCursors.Length;
                 activeCursor = pickUpCursors[currentFrame];
+                hotSpot = new Vector2(activeCursor.width / 2, activeCursor.height / 2);
                 break;
             case CursorState.Move:
                 currentFrame = (int)Time.time % moveCursors.Length;
                 activeCursor = moveCursors[currentFrame];
+                hotSpot = new Vector2(activeCursor.width / 2, activeCursor.height / 2);
                 break;
             case CursorState.PanLeft:
                 activeCursor = panLeftCursor;
+                hotSpot = new Vector2(0, activeCursor.height / 2);
                 break;
             case CursorState.PanRight:
                 activeCursor = panRightCursor;
+                hotSpot = new Vector2(activeCursor.width, activeCursor.height / 2);
                 break;
             case CursorState.PanUp:
                 activeCursor = panUpCursor;
+                hotSpot = new Vector2(activeCursor.width / 2, 0);
                 break;
             case CursorState.PanDown:
                 activeCursor = panDownCursor;
+                hotSpot = new Vector2(activeCursor.width / 2, activeCursor.height);
                 break;
             default:
                 break;
