@@ -117,15 +117,17 @@ public class UserInput : MonoBehaviour {
             Rect mouseMovementRect = CalculateMouseMovementRect(pos1, pos2);
             player.ui.selectBoxScale = mouseMovementRect.size;
             player.ui.selectBoxPos = mouseMovementRect.center;
-        }
-        if (Input.GetMouseButtonUp(0)) {
-            print("LEFT UP");
-            selecting = false;
 
-            SelectMultiple();
+            if (Input.GetMouseButtonUp(0)) {
+                print("LEFT UP");
+                selecting = false;
 
-            //Make select box size zero to effectively remove it while we are not selecting anything.
-            player.ui.selectBoxScale = Vector2.zero;
+                if(selectPos != Input.mousePosition) {
+                    SelectMultiple();
+                }
+                //Make select box size zero to effectively remove it while we are not selecting anything.
+                player.ui.selectBoxScale = Vector2.zero;
+            }
         }
         if (Input.GetMouseButtonDown(0)) {
             print("LEFT DOWN!");
