@@ -12,6 +12,10 @@ public class Unit : WorldObject {
     public int attackDamage;
     public float attackRange;
     public float attackCooldown; //time in seconds how long the unit must wait between each attack.
+    /// <summary>
+    /// Distance this unit will automatically look for targets.
+    /// </summary>
+    public float sightRadius;
 
     private NavMeshAgent agent;
     private bool carrying = false;
@@ -20,14 +24,14 @@ public class Unit : WorldObject {
     private HealthBar healthBar;
     private float remainingCooldown = 0;
 
-    protected override void Awake() {
-        base.Awake();
-    }
+    private Projector selectionCircle;
 
     // Use this for initialization
     protected override void Start () {
         base.Start();
         agent = GetComponent<NavMeshAgent>();
+        selectionCircle = GetComponentInChildren<Projector>();
+        selectionCircle.enabled = false;
 
         //Initiate the unit's health bar.
         Transform parent = GetOwner().ui.canvas.gameObject.transform.Find("PassiveElementsRect");
@@ -53,22 +57,32 @@ public class Unit : WorldObject {
                 break;
             case Order.PICK_UP:
                 if(target is Ore && !(target as Ore).carrier) {
-                    if(DistanceToTarget() <= pickUpDistance) {
+                    if(DistanceToTarget(target) <= pickUpDistance) {
                         PickUp(target as Ore);
                         ClearOrder();
+                    } else {
+                        agent.SetDestination(target.transform.position);
                     }
+                } else {
+                    //Target is no longer or or has been picked up, look for other ore in vicinity
+                    GetNewTarget(currentOrder);
                 }
                 break;
             case Order.ATTACK:
                 if(target is Unit) {
-                    if(DistanceToTarget() <= attackRange) {
-                        if(remainingCooldown <= 0) {
-                            remainingCooldown = attackCooldown;
-                            Attack(target as Unit);
+                    if (target) {
+                        if (DistanceToTarget(target) <= attackRange) {
+                            if (remainingCooldown <= 0) {
+                                remainingCooldown = attackCooldown;
+                                Attack(target as Unit);
+                            }
+                        } else if (agent.destination != target.transform.position) {
+                            //Move into attack range
+                            agent.SetDestination(target.transform.position);
                         }
-                    } else if(agent.destination != target.transform.position) {
-                        //Move into attack range
-                        agent.SetDestination(target.transform.position);
+                    } else {
+                        //Target Unit has died or is null for some other reason, look for new target to attack.
+                        GetNewTarget(currentOrder);
                     }
                 }
                 break;
@@ -76,19 +90,17 @@ public class Unit : WorldObject {
                 break;
         }
 	}
-
-    protected override void OnGUI() {
-        base.OnGUI();
-        if(player && player.human && currentlySelected) {
-            CalculateBounds();
-        }
+    
+    public void SetSelection(bool selected) {
+        currentlySelected = selected;
+        selectionCircle.enabled = selected;
     }
 
     public bool InSelectionBounds(Bounds selectionBounds) {
         return selectionBounds.Contains(Camera.main.WorldToViewportPoint(transform.position));
     }
 
-    protected virtual float DistanceToTarget() {
+    protected virtual float DistanceToTarget(WorldObject target) {
         return Vector3.Distance(gameObject.transform.position, target.gameObject.transform.position);
     }
 
@@ -126,9 +138,56 @@ public class Unit : WorldObject {
         currentOrder = Order.NONE;
     }
 
-    public virtual void TookDamage(int damage) {
-        currentHealth -= damage;
-        healthBar.OnHealthChange();
+    protected virtual void GetNewTarget(Order order) {
+        List<Collider> colliderList = new List<Collider>(Physics.OverlapSphere(transform.position, sightRadius));
+        WorldObject closestTarget = null;
+        switch (order) {
+            case Order.ATTACK:
+                foreach(Collider c in colliderList) {
+                    Unit possibleTarget = c.GetComponentInParent<Unit>();
+                    if(possibleTarget && possibleTarget.player != player) {
+                        if(closestTarget == null || DistanceToTarget(possibleTarget) < DistanceToTarget(closestTarget)) {
+                            closestTarget = possibleTarget;
+                        }
+                    }
+                }
+                break;
+            case Order.PICK_UP:
+                print("Looking for ore");
+                foreach(Collider c in colliderList) {
+                    Ore possibleTarget = c.GetComponentInParent<Ore>();
+                    if (possibleTarget && !possibleTarget.carrier) {
+                        if(closestTarget == null || DistanceToTarget(possibleTarget) < DistanceToTarget(closestTarget)) {
+                            print(possibleTarget.transform.position);
+                            closestTarget = possibleTarget;
+                        }
+                    }
+                }
+                break;
+        }
+        if (closestTarget) {
+            //New target found, continue executing order.
+            target = closestTarget;
+        } else {
+            //No viable targets found, cancel order.
+            ClearOrder();
+        }
+    }
+
+    protected virtual void OnDeath() {
+        player.ownedUnits.Remove(this);
+        Destroy(healthBar.gameObject);
+        Destroy(gameObject);
+    }
+
+    public virtual void ChangeHealth(int amount) {
+        currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
+
+        if(currentHealth == 0) {
+            OnDeath();
+        }else {
+            healthBar.OnHealthChange();
+        }
     }
 
     public virtual Vector3 GetHealthBarPos() {
@@ -183,7 +242,7 @@ public class Unit : WorldObject {
     }
 
     private void MeleeAttack(Unit target) {
-        target.TookDamage(attackDamage);
+        target.ChangeHealth(-attackDamage);
     }
 
     /**

@@ -32,13 +32,13 @@ public class Player : MonoBehaviour {
     public void SelectUnits(List<Unit> units) {
         if (selectedUnits.Count > 0) {
             foreach (Unit unit in selectedUnits) {
-                unit.SetSelection(false, ui.GetPlayingArea());
+                unit.SetSelection(false);
             }
             selectedUnits.Clear();
         } else {
             selectedUnits = units;
             foreach (Unit unit in selectedUnits) {
-                unit.SetSelection(true, ui.GetPlayingArea());
+                unit.SetSelection(true);
             }
         }
     }
@@ -46,7 +46,7 @@ public class Player : MonoBehaviour {
     public void Deselect() {
         if (selectedUnits.Count > 0) {
             foreach (Unit unit in selectedUnits) {
-                unit.SetSelection(false, ui.GetPlayingArea());
+                unit.SetSelection(false);
             }
             selectedUnits.Clear();
         }
