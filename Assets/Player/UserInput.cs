@@ -189,7 +189,7 @@ public class UserInput : MonoBehaviour {
                     }
                 } else {
                     //Deselect everything on left-clicking the ground
-                    player.Deselect();
+                    player.DeselectAll();
                 }
             }
         }

@@ -43,13 +43,17 @@ public class Player : MonoBehaviour {
         }
     }
 
-    public void Deselect() {
+    public void DeselectAll() {
         if (selectedUnits.Count > 0) {
             foreach (Unit unit in selectedUnits) {
                 unit.SetSelection(false);
             }
             selectedUnits.Clear();
         }
+    }
+
+    public void Deselect(Unit unit) {
+        selectedUnits.Remove(unit);
     }
 
     /**

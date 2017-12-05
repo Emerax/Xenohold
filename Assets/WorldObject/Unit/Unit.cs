@@ -16,13 +16,18 @@ public class Unit : WorldObject {
     /// Distance this unit will automatically look for targets.
     /// </summary>
     public float sightRadius;
+    /// <summary>
+    /// Distance this units call for aid will be heard.
+    /// </summary>
+    public float callRange;
 
-    private NavMeshAgent agent;
-    private bool carrying = false;
-    private Order currentOrder = Order.NONE;
-    private WorldObject target;
-    private HealthBar healthBar;
-    private float remainingCooldown = 0;
+    protected NavMeshAgent agent;
+
+    protected bool carrying = false;
+    protected Order currentOrder = Order.NONE;
+    protected WorldObject target;
+    protected HealthBar healthBar;
+    protected float remainingCooldown = 0;
 
     private Projector selectionCircle;
 
@@ -136,6 +141,7 @@ public class Unit : WorldObject {
     protected virtual void ClearOrder() {
         target = null;
         currentOrder = Order.NONE;
+        agent.ResetPath();
     }
 
     protected virtual void GetNewTarget(Order order) {
@@ -176,17 +182,25 @@ public class Unit : WorldObject {
 
     protected virtual void OnDeath() {
         player.ownedUnits.Remove(this);
+        if (currentlySelected) {
+            player.Deselect(this);
+        }
         Destroy(healthBar.gameObject);
         Destroy(gameObject);
     }
 
-    public virtual void ChangeHealth(int amount) {
+    public virtual void ChangeHealth(int amount, WorldObject source) {
         currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
 
         if(currentHealth == 0) {
             OnDeath();
         }else {
             healthBar.OnHealthChange();
+        }
+
+        if(currentHealth > 0 && source is Unit && (source as Unit).player != player) {
+            BeginAttack(source as Unit);
+            CallForAid(source as Unit);
         }
     }
 
@@ -236,13 +250,13 @@ public class Unit : WorldObject {
      * Unit is ordered to attack the target.
      * Will keep attempting to move within range of the target and attack it whenever possible.
      */
-    private void BeginAttack(Unit target) {
+    protected virtual void BeginAttack(Unit target) {
         this.target = target;
         currentOrder = Order.ATTACK;
     }
 
     private void MeleeAttack(Unit target) {
-        target.ChangeHealth(-attackDamage);
+        target.ChangeHealth(-attackDamage, this);
     }
 
     /**
@@ -252,5 +266,18 @@ public class Unit : WorldObject {
         currentOrder = Order.PICK_UP;
         target = ore;
         agent.SetDestination(ore.gameObject.transform.position);
+    }
+
+    /// <summary>
+    /// Ask all allied Ghost within callrange to attack this Ghosts target, as long as they dont already have a target.
+    /// </summary>
+    protected void CallForAid(Unit target) {
+        List<Collider> colliderList = new List<Collider>(Physics.OverlapSphere(transform.position, callRange));
+        foreach (Collider c in colliderList) {
+            Unit unit = c.gameObject.GetComponentInParent<Unit>();
+            if (unit && unit.player == player && !unit.target) {
+                unit.BeginAttack(target);
+            }
+        }
     }
 }
