@@ -9,7 +9,7 @@ public class UI : MonoBehaviour {
 
     public Texture2D activeCursor;
     public Texture2D idleCursor, idleCursorSelect, panDownCursor, panLeftCursor, panRightCursor, panUpCursor;
-    public Texture2D[] moveCursors, attackCursors, pickUpCursors;
+    public Texture2D[] moveCursors, attackCursors, pickUpCursors, putDownCursors;
 
     public Canvas canvas;
     public RectTransform passiveElements;
@@ -130,6 +130,11 @@ public class UI : MonoBehaviour {
             case CursorState.PanDown:
                 activeCursor = panDownCursor;
                 hotSpot = new Vector2(activeCursor.width / 2, activeCursor.height);
+                break;
+            case CursorState.PutDown:
+                currentFrame = (int)Time.time % pickUpCursors.Length;
+                activeCursor = putDownCursors[currentFrame];
+                hotSpot = new Vector2(activeCursor.width / 2, activeCursor.height / 2);
                 break;
             default:
                 break;

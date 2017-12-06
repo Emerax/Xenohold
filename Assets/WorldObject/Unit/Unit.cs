@@ -109,9 +109,9 @@ public class Unit : WorldObject {
         return Vector3.Distance(gameObject.transform.position, target.gameObject.transform.position);
     }
 
-    /**
-     * Places ore on top of units head, and attaches it to units transform, making it follow.
-     */
+    /// <summary>
+    /// Places ore on top of units head, and attaches it to units transform, making it follow.
+    /// </summary>
     protected virtual void PickUp(Ore ore) {
         if (carrying) {
             Drop();
