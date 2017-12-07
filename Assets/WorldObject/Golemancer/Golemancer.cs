@@ -54,6 +54,7 @@ public class Golemancer : Unit {
         //Immediately after creating the new unit, drop ore, destroy it, and lastly destroy the statue.
         Drop();
         Destroy(ore.gameObject);
+        print("Destroying statue");
         Destroy(statue.gameObject);
     }
 
