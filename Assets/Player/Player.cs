@@ -30,16 +30,10 @@ public class Player : MonoBehaviour {
 	}
 
     public void SelectUnits(List<Unit> units) {
-        if (selectedUnits.Count > 0) {
-            foreach (Unit unit in selectedUnits) {
-                unit.SetSelection(false);
-            }
-            selectedUnits.Clear();
-        } else {
-            selectedUnits = units;
-            foreach (Unit unit in selectedUnits) {
-                unit.SetSelection(true);
-            }
+        DeselectAll();
+        selectedUnits = units;
+        foreach (Unit unit in selectedUnits) {
+            unit.SetSelection(true);
         }
     }
 

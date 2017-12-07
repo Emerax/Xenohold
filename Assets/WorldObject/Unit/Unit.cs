@@ -269,7 +269,7 @@ public class Unit : WorldObject {
     }
 
     /// <summary>
-    /// Ask all allied Ghost within callrange to attack this Ghosts target, as long as they dont already have a target.
+    /// Ask all allied Units within callrange to attack this Units target, as long as they dont already have a target.
     /// </summary>
     protected void CallForAid(Unit target) {
         List<Collider> colliderList = new List<Collider>(Physics.OverlapSphere(transform.position, callRange));
