@@ -119,7 +119,6 @@ public class UserInput : MonoBehaviour {
             player.ui.selectBoxPos = mouseMovementRect.center;
 
             if (Input.GetMouseButtonUp(0)) {
-                print("LEFT UP");
                 selecting = false;
 
                 if(selectPos != Input.mousePosition) {
@@ -130,7 +129,6 @@ public class UserInput : MonoBehaviour {
             }
         }
         if (Input.GetMouseButtonDown(0)) {
-            print("LEFT DOWN!");
             selectPos = Input.mousePosition;
             selecting = true;
 

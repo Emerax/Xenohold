@@ -8,7 +8,7 @@ public class Golemancer : Unit {
     protected override void Update() {
         base.Update();
         if(currentOrder == Order.PUT_DOWN) {
-            if (carrying) {
+            if (carrying && target) {
                 if (DistanceToTarget(target) <= pickUpDistance) {
                     Infuse(target as Statue);
                     ClearOrder();
