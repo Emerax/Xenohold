@@ -12,6 +12,7 @@ public class Player : MonoBehaviour {
     public List<Unit> selectedUnits;
 
     public GameObject baseUnitPrefab;
+    public GameObject redGolemPrefab, greenGolemPrefab, blueGolemPrefab;
 
     void Awake() {
         ui = GetComponentInChildren<UI>();
