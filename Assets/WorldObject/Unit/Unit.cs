@@ -216,6 +216,8 @@ public class Unit : WorldObject {
             player.ui.SetCursorState(CursorState.PickUp);
         } else if (worldObject is Unit && !(worldObject as Unit).GetOwner().Equals(GetOwner())) {
             player.ui.SetCursorState(CursorState.Attack);
+        } else if (worldObject == this && carrying) {
+            player.ui.SetCursorState(CursorState.PutDown);
         }
     }
 
@@ -231,6 +233,8 @@ public class Unit : WorldObject {
         } else if (worldObject is Unit && !(worldObject as Unit).GetOwner().Equals(GetOwner())) {
             //Right-clicking an enemy, KILL IT KILL IT DEAD
             BeginAttack(worldObject as Unit);
+        } else if (worldObject == this && carrying) {
+            Drop();
         }
     }
 
@@ -269,7 +273,7 @@ public class Unit : WorldObject {
     }
 
     /// <summary>
-    /// Ask all allied Units within callrange to attack this Units target, as long as they dont already have a target.
+    /// Ask all allied Units within callrange to attack this units target, as long as they dont already have a target.
     /// </summary>
     protected void CallForAid(Unit target) {
         List<Collider> colliderList = new List<Collider>(Physics.OverlapSphere(transform.position, callRange));
