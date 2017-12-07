@@ -9,7 +9,7 @@ public class Golemancer : Unit {
         base.Update();
         if(currentOrder == Order.PUT_DOWN) {
             if (carrying && target) {
-                if (DistanceToTarget(target) <= pickUpDistance) {
+                if (DistanceToTarget(target) <= pickUpDistance + 1) {
                     Infuse(target as Statue);
                     ClearOrder();
                 }
@@ -49,8 +49,27 @@ public class Golemancer : Unit {
 
     protected void Infuse(Statue statue) {
         Ore ore = transform.GetComponentInChildren<Ore>();
+        GameObject newUnitPrefab = null;
         //Use ore color to determine what unit is created
-        player.AddUnit(statue.transform.position, statue.transform.rotation);
+        switch (ore.type) {
+            case OreType.Blue:
+                newUnitPrefab = player.blueGolemPrefab;
+                break;
+            case OreType.Green:
+                newUnitPrefab = player.greenGolemPrefab;
+                break;
+            case OreType.Red:
+                newUnitPrefab = player.redGolemPrefab;
+                break;
+        }
+
+        if (newUnitPrefab) {
+            statue.obstacle.carving = false;
+            player.AddUnit(newUnitPrefab, statue.transform.position, statue.transform.rotation);
+        } else {
+            print("Prefab null in Infuse!");
+        }
+
         //Immediately after creating the new unit, drop ore, destroy it, and lastly destroy the statue.
         Drop();
         Destroy(ore.gameObject);

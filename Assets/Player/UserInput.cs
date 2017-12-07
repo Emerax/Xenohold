@@ -135,8 +135,6 @@ public class UserInput : MonoBehaviour {
             LeftMouseClick();
         } else if (Input.GetMouseButtonDown(1) && player.selectedUnits.Count > 0) {
             RightMouseClick();
-        } else if (Input.GetMouseButtonDown(1)) {
-            player.AddUnit(FindHitPoint(), new Quaternion());
         }
         MouseHover();
     }
