@@ -4,7 +4,7 @@ using UnityEngine;
 using RTS;
 
 public class UI : MonoBehaviour {
-    public GUISkin resourceSkin, ordersSkin, selectBoxSkin;
+    public GUISkin selectBoxSkin;
     public Player player;
 
     public Texture2D activeCursor;
@@ -37,7 +37,6 @@ public class UI : MonoBehaviour {
 
 		if(player && player.human) {
             UpdateSelectionBox();
-            DrawResourceBar();
             DrawMouseCursor();
         }
 	}
@@ -45,13 +44,6 @@ public class UI : MonoBehaviour {
     private void UpdateSelectionBox() {
         selectBox.sizeDelta = selectBoxScale;
         selectBox.anchoredPosition = selectBoxPos;
-    }
-
-    private void DrawResourceBar() {
-        GUI.skin = resourceSkin;
-        GUI.BeginGroup(new Rect(0, 0, Screen.width, RESOURCE_BAR_HEIGHT));
-        GUI.Box(new Rect(0, 0, Screen.width, RESOURCE_BAR_HEIGHT), "");
-        GUI.EndGroup();
     }
 
     private void DrawMouseCursor() {

@@ -11,6 +11,7 @@ public class UserInput : MonoBehaviour {
     public float rotateSpeed = 100;
     public float minCameraHeight = 10;
     public float maxCameraHeight = 40;
+    public Rigidbody cameraBody;
 
     private Player player;
     private bool panning = false;
@@ -24,7 +25,6 @@ public class UserInput : MonoBehaviour {
     // Use this for initialization
     void Start () {
         player = transform.root.GetComponent<Player>();
-		
 	}
 	
 	// Update is called once per frame
@@ -87,6 +87,7 @@ public class UserInput : MonoBehaviour {
 
         //only update camera if it has actually moved.
         if(destination != origin) {
+            //cameraBody.
             Camera.main.transform.position = Vector3.MoveTowards(origin, destination, Time.deltaTime * panSpeed);
         }
 
@@ -234,7 +235,7 @@ public class UserInput : MonoBehaviour {
         if (player.human && player.ui.MouseInBounds()) {
             GameObject hoverObject = FindHitObject();
             if (hoverObject) {
-                if(hoverObject.name != "Ground") {
+                if(!hoverObject.name.Contains("Ground")) {
                     WorldObject worldObject = hoverObject.transform.parent.GetComponent<WorldObject>();
                     if (worldObject) {
                         if (player.selectedUnits.Count > 0) {
