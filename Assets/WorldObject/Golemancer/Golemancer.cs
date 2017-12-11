@@ -9,9 +9,11 @@ public class Golemancer : Unit {
         base.Update();
         if(currentOrder == Order.PUT_DOWN) {
             if (carrying && target) {
-                if (DistanceToTarget(target) <= pickUpDistance + 1) {
-                    Infuse(target as Statue);
-                    ClearOrder();
+                if(target is Statue) {
+                    if (DistanceToTarget(target) <= pickUpDistance + 1) {
+                        Infuse(target as Statue);
+                        ClearOrder();
+                    }
                 }
             } else {
                 //Stop trying to infuse if no longer holding ore

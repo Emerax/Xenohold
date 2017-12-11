@@ -91,6 +91,19 @@ public class Unit : WorldObject {
                     }
                 }
                 break;
+            case Order.PUT_DOWN:
+                if(target is DropOff && carrying) {
+                    if(DistanceToTarget(target) < pickUpDistance) {
+                        Deliver(target as DropOff);
+                        ClearOrder();
+                    } else {
+                        agent.SetDestination(target.transform.position);
+                    }
+                } else {
+                    // Target is no longer a dropoff, or unit is no longer carrying for some reason
+                    ClearOrder();
+                }
+                break;
             default:
                 break;
         }
@@ -218,6 +231,8 @@ public class Unit : WorldObject {
             player.ui.SetCursorState(CursorState.Attack);
         } else if (worldObject == this && carrying) {
             player.ui.SetCursorState(CursorState.PutDown);
+        } else if (worldObject is DropOff && carrying) {
+            player.ui.SetCursorState(CursorState.PutDown);
         }
     }
 
@@ -235,6 +250,8 @@ public class Unit : WorldObject {
             BeginAttack(worldObject as Unit);
         } else if (worldObject == this && carrying) {
             Drop();
+        } else if (worldObject is DropOff && carrying) {
+            BeginDeliver(worldObject as DropOff);
         }
     }
 
@@ -257,6 +274,23 @@ public class Unit : WorldObject {
     protected virtual void BeginAttack(Unit target) {
         this.target = target;
         currentOrder = Order.ATTACK;
+    }
+
+    private void Deliver(DropOff target) {
+        Ore ore = GetComponentInChildren<Ore>();
+        if (ore) {
+            target.ReceiveOre(ore);
+        } else {
+            Debug.LogError("Ore null in Deliver");
+        }
+        //Drop and destroy ore immediately after delivery
+        Drop();
+        Destroy(ore.gameObject);
+    }
+
+    protected virtual void BeginDeliver(DropOff target) {
+        this.target = target;
+        currentOrder = Order.PUT_DOWN;
     }
 
     private void MeleeAttack(Unit target) {
