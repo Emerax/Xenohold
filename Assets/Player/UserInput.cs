@@ -11,7 +11,7 @@ public class UserInput : MonoBehaviour {
     public float rotateSpeed = 100;
     public float minCameraHeight = 10;
     public float maxCameraHeight = 40;
-    public Rigidbody cameraBody;
+    public float mapHeight, mapWidth;
 
     private Player player;
     private bool panning = false;
@@ -84,6 +84,10 @@ public class UserInput : MonoBehaviour {
         }else if(destination.y < minCameraHeight) {
             destination.y = minCameraHeight;
         }
+
+        //Clamp destination so camera does not move out of bounds
+        destination.x = Mathf.Clamp(destination.x, -mapWidth, mapWidth);
+        destination.z = Mathf.Clamp(destination.z, -mapHeight, mapHeight);
 
         //only update camera if it has actually moved.
         if(destination != origin) {
@@ -176,7 +180,7 @@ public class UserInput : MonoBehaviour {
             GameObject hitObject = FindHitObject();
             Vector3 hitPoint = FindHitPoint();
             if(hitObject && hitPoint != ResourceManager.InvalidPosition) {
-                if(hitObject.name != "Ground") {
+                if(!hitObject.name.Contains("Ground")) {
                     WorldObject worldObject = hitObject.transform.parent.GetComponent<WorldObject>();
                     if(worldObject && worldObject is Ore && (worldObject as Ore).carrier) {
                         worldObject = (worldObject as Ore).carrier;
@@ -197,7 +201,7 @@ public class UserInput : MonoBehaviour {
             GameObject hitObject = FindHitObject();
             Vector3 hitPoint = FindHitPoint();
             if(hitObject && hitPoint != ResourceManager.InvalidPosition) {
-                if(hitObject.name != "Ground") {
+                if(!hitObject.name.Contains("Ground")) {
                     WorldObject worldObject = hitObject.transform.parent.GetComponent<WorldObject>();
                     if (worldObject) {
                         foreach(Unit unit in player.selectedUnits) {
@@ -253,7 +257,6 @@ public class UserInput : MonoBehaviour {
                         player.selectedUnits[0].SetGroundHoverState();
                     } else {
                         //Hovering above ground with nothign selected
-                        player.ui.SetCursorState(CursorState.Idle);
                     }
                 }
             }
