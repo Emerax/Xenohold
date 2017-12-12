@@ -7,6 +7,7 @@ using RTS;
 public class UI : MonoBehaviour {
     public GUISkin selectBoxSkin;
     public Player player;
+    public GameManager manager;
 
     public Texture2D activeCursor;
     public Texture2D idleCursor, idleCursorSelect, panDownCursor, panLeftCursor, panRightCursor, panUpCursor;
@@ -14,17 +15,20 @@ public class UI : MonoBehaviour {
 
     public Canvas canvas;
     public RectTransform passiveElements;
+    public RectTransform startMenuElements;
+    public RectTransform endScreen;
     public RectTransform selectBox;
     public Text scoreText;
     public Text timeText;
     public Vector3 selectBoxScale = new Vector2(0, 0);
     public Vector2 selectBoxPos = Vector2.zero;
 
+    public InputField gameTimeField;
+
     private const int ORDERS_BAR_WIDTH = 150, RESOURCE_BAR_HEIGHT = 40, SELECTION_NAME_HEIGHT = 15;
     private Vector2 hotSpot;
     private CursorState activeCursorState;
     private int currentFrame = 0;
-    private GameManager manager;
 
     void Awake() {
         canvas = GetComponentInChildren<Canvas>();
@@ -36,10 +40,11 @@ public class UI : MonoBehaviour {
         player = transform.root.GetComponent<Player>();
         ResourceManager.StoreSelectBoxItems(selectBoxSkin);
         SetCursorState(CursorState.Idle);
+        endScreen.gameObject.SetActive(false);
+        passiveElements.gameObject.SetActive(false);
 	}
 
 	void OnGUI () {
-
 		if(player && player.human) {
             UpdateUI();
             UpdateSelectionBox();
@@ -81,6 +86,26 @@ public class UI : MonoBehaviour {
             currentFrame = (int)Time.time % pickUpCursors.Length;
             activeCursor = pickUpCursors[currentFrame];
         }
+    }
+
+    public void StartUI() {
+        passiveElements.gameObject.SetActive(true);
+    }
+
+    public void CloseUI() {
+        passiveElements.gameObject.SetActive(false);
+    }
+
+    public void CloseMenu() {
+        player.menu = false; //Enable game input from player;
+        startMenuElements.gameObject.SetActive(false);
+    }
+
+    public void OpenEndScreen(string cause) {
+        player.menu = true;
+        endScreen.gameObject.SetActive(true);
+        endScreen.Find("CauseText").GetComponent<Text>().text = cause;
+        endScreen.Find("ScoreValue").GetComponent<Text>().text = manager.score.ToString("0");
     }
 
     public bool MouseInBounds() {

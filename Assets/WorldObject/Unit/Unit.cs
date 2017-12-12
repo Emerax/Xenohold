@@ -39,8 +39,8 @@ public class Unit : WorldObject {
         selectionCircle.enabled = false;
 
         //Initiate the unit's health bar.
-        Transform parent = GetOwner().ui.canvas.gameObject.transform.Find("PassiveElementsRect");
-        GameObject newBar = Instantiate(healthBarObjectPrefab, parent);
+        Transform healthBarTransform = transform.root.Find("PassiveElementsRect");
+        GameObject newBar = Instantiate(healthBarObjectPrefab, healthBarTransform);
         newBar.GetComponent<HealthBar>().unit = this;
         healthBar = newBar.GetComponent<HealthBar>();
     }
@@ -93,15 +93,12 @@ public class Unit : WorldObject {
                 break;
             case Order.PUT_DOWN:
                 if(target is DropOff && carrying) {
-                    if(DistanceToTarget(target) < pickUpDistance) {
+                    if(DistanceToTarget(target) < pickUpDistance + 4) {
                         Deliver(target as DropOff);
                         ClearOrder();
                     } else {
                         agent.SetDestination(target.transform.position);
                     }
-                } else {
-                    // Target is no longer a dropoff, or unit is no longer carrying for some reason
-                    ClearOrder();
                 }
                 break;
             default:

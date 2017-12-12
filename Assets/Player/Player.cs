@@ -5,6 +5,8 @@ using RTS;
 
 public class Player : MonoBehaviour {
 
+    public bool menu = true;
+
     public string username;
     public bool human;
     public UI ui;

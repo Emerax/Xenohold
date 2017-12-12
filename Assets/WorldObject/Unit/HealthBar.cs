@@ -2,18 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class HealthBar : MonoBehaviour {
 
     public Unit unit;
     public Image image;
 
+    private Player player;
     private RectTransform healthBarRectTransform;
 
 	// Use this for initialization
 	void Start () {
+        GameObject[] objectList = SceneManager.GetActiveScene().GetRootGameObjects();
+        player = FindPlayer(objectList);
         image = GetComponentInChildren<Image>();
-        healthBarRectTransform = transform.parent.GetComponent<RectTransform>();
+        healthBarRectTransform = (RectTransform)player.ui.canvas.transform.Find("PassiveElementsRect");
+        transform.SetParent(healthBarRectTransform);
 	}
 	
 	// Update is called once per frame
@@ -39,5 +44,14 @@ public class HealthBar : MonoBehaviour {
             return true;
         }
         return false;
+    }
+
+    private Player FindPlayer(GameObject[] objectList) {
+        for(int i = 0; i < objectList.Length; i++) {
+            if(objectList[i].name == "Player") {
+                return objectList[i].GetComponent<Player>();
+            }
+        }
+        return null;
     }
 }

@@ -23,18 +23,27 @@ public class UserInput : MonoBehaviour {
     public bool selecting;
 
     // Use this for initialization
-    void Start () {
+    void Awake () {
         player = transform.root.GetComponent<Player>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        if (player.human) {
+        if (player.human && !player.menu) {
             MoveCamera();
             RotateCamera();
             MouseActivity();
         }
 	}
+
+    /// <summary>
+    /// Called when start game button is clicked, hide menu rect, show ui rect and start game manager.
+    /// </summary>
+    public void StartGame() {
+        player.ui.StartUI();
+        player.ui.manager.StartGame(int.Parse(player.ui.gameTimeField.text));
+        player.ui.CloseMenu();
+    }
 
     private void MoveCamera() {
         float xpos = Input.mousePosition.x;

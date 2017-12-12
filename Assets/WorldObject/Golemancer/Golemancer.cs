@@ -8,7 +8,10 @@ public class Golemancer : Unit {
     protected override void Update() {
         base.Update();
         if(currentOrder == Order.PUT_DOWN) {
+            print("c: " + carrying);
+            print("t: " + target);
             if (carrying && target) {
+                print("carrying and target");
                 if(target is Statue) {
                     if (DistanceToTarget(target) <= pickUpDistance + 1) {
                         Infuse(target as Statue);
@@ -45,6 +48,7 @@ public class Golemancer : Unit {
     public override void RightClickObject(WorldObject worldObject) {
         base.RightClickObject(worldObject);
         if(worldObject is Statue) {
+            print("Hello!");
             BeginInfuse(worldObject as Statue);
         }
     }
@@ -83,6 +87,12 @@ public class Golemancer : Unit {
         currentOrder = Order.PUT_DOWN;
         target = statue;
         agent.SetDestination(target.transform.position);
+        print("Begun Infusion");
+    }
+
+    protected override void OnDeath() {
+        base.OnDeath();
+        player.GetComponent<GameManager>().EndGame("YOU DIED!");
     }
 
 }
