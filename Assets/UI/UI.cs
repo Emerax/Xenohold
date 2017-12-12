@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using RTS;
 
 public class UI : MonoBehaviour {
@@ -14,6 +15,8 @@ public class UI : MonoBehaviour {
     public Canvas canvas;
     public RectTransform passiveElements;
     public RectTransform selectBox;
+    public Text scoreText;
+    public Text timeText;
     public Vector3 selectBoxScale = new Vector2(0, 0);
     public Vector2 selectBoxPos = Vector2.zero;
 
@@ -21,6 +24,7 @@ public class UI : MonoBehaviour {
     private Vector2 hotSpot;
     private CursorState activeCursorState;
     private int currentFrame = 0;
+    private GameManager manager;
 
     void Awake() {
         canvas = GetComponentInChildren<Canvas>();
@@ -28,6 +32,7 @@ public class UI : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        manager = GetComponentInParent<GameManager>();
         player = transform.root.GetComponent<Player>();
         ResourceManager.StoreSelectBoxItems(selectBoxSkin);
         SetCursorState(CursorState.Idle);
@@ -36,10 +41,18 @@ public class UI : MonoBehaviour {
 	void OnGUI () {
 
 		if(player && player.human) {
+            UpdateUI();
             UpdateSelectionBox();
             DrawMouseCursor();
         }
 	}
+
+    private void UpdateUI() {
+        //Update timer
+        string minutes = Mathf.Floor(manager.remainingTime / 60).ToString("00");
+        string seconds = Mathf.Floor(manager.remainingTime % 60).ToString("00");
+        timeText.text = minutes + ":" + seconds;
+    }
 
     private void UpdateSelectionBox() {
         selectBox.sizeDelta = selectBoxScale;

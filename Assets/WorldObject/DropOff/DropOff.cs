@@ -6,6 +6,7 @@ using RTS;
 public class DropOff : WorldObject {
 
     public int redOre, blueOre, greenOre = 0;
+    public GameManager manager;
 
     public void ReceiveOre(Ore ore) {
         switch (ore.type) {
@@ -19,5 +20,6 @@ public class DropOff : WorldObject {
                 greenOre += 1;
                 break;
         }
+        manager.UpdateScore();
     }
 }
