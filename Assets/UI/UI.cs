@@ -42,6 +42,7 @@ public class UI : MonoBehaviour {
         SetCursorState(CursorState.Idle);
         endScreen.gameObject.SetActive(false);
         passiveElements.gameObject.SetActive(false);
+        (passiveElements.Find("HealthBarsRect") as RectTransform).sizeDelta = new Vector2(Screen.width, Screen.height);
 	}
 
 	void OnGUI () {

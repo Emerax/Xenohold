@@ -17,7 +17,7 @@ public class HealthBar : MonoBehaviour {
         GameObject[] objectList = SceneManager.GetActiveScene().GetRootGameObjects();
         player = FindPlayer(objectList);
         image = GetComponentInChildren<Image>();
-        healthBarRectTransform = (RectTransform)player.ui.canvas.transform.Find("PassiveElementsRect");
+        healthBarRectTransform = (RectTransform)player.ui.canvas.transform.Find("PassiveElementsRect").Find("HealthBarsRect");
         transform.SetParent(healthBarRectTransform);
 	}
 	
